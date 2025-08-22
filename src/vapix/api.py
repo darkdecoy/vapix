@@ -2,6 +2,7 @@ import time
 import requests
 
 from .DoorControl import DoorControl
+from .Schedule import ScheduleEndpoint
 
 from requests.auth import HTTPDigestAuth
 
@@ -48,6 +49,7 @@ class api:
         self.session.auth = HTTPDigestAuth(self.user, self.password)
         self.session.timeout = timeout
         self.doorcontrol = DoorControl(self)
+        self.schedule = ScheduleEndpoint(self)
 
     def _send_request(self, endpoint, method="GET", params=None):
         """
