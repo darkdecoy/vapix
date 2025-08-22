@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import json
+import icalendar
 
 # Import for type hints only
 if TYPE_CHECKING:
@@ -37,12 +38,12 @@ class Schedule:
 
         self.api = schedule.api
 
-        self.name = "Test Schedule"
+        self.name = ""
         self.token = token
-        self.description = "New Schedule"
+        self.description = ""
         self.attribute = []
         self.type = "addition"
-        self.calendar = ""
+        self.calendar = None
 
         self.get_schedule()
 
@@ -52,110 +53,16 @@ class Schedule:
 
         data = json.loads(resp)
 
-        schedule = data['Schedule'][0]
+        if data['Schedule'][0]['ScheduleDefinition'] != '':
+            self.type = "addtion"
+            schedule = data['Schedule'][0]['ScheduleDefinition']
 
-        self.name = schedule['Name']
-        self.description = schedule['Description']
-        self.attribute = schedule['Attribute']
-
-        if schedule['ScheduleDefinition'] != '':
-            self.type = "addition"
-            self.calendar = Calendar(definition=schedule['ScheduleDefinition'])
-        elif schedule['ExceptionScheduleDefinition'] != '':
+        elif data['Schedule'][0]['ExceptionScheduleDefinition']:
             self.type = "subtraction"
-            self.calendar = Calendar(definition=schedule['ExceptionScheduleDefinition'])
-        else:
-            print("Invalid Schedule Definition Provided")
+            schedule = data['Schedule'][0]['ExceptionScheduleDefinition']
 
-        self.token
+        self.calendar = icalendar.Calendar.from_ical(schedule)
 
-    def scheduledefinition(self) -> str:
+    def add_calendar(self) -> str:
 
         return self.calendar.definition
-
-class Calendar:
-
-    def __init__(self, definition) -> None:
-
-        self.prefix = "BEGIN:VCALENDAR\r\nPRODID:\r\nVERSION:2.0\r\n"
-        self.postfix = "END:VCALENDAR\r\n"
-
-        self.definition = definition
-
-        self.events = {}
-
-        self.create_events(events=self.definition.strip(self.prefix).strip(self.postfix))
-
-    def create_events(self, events) -> None:
-
-        name = ""
-
-        events = events.split("\r\n")
-
-        for event in events:
-
-            data = event.split(":")
-
-            match data[0]:
-                case "SUMMARY":
-                    name = data[1]
-                    self.events[name] = Event()
-                    self.events[name].summary = name
-                case "DTSTART":
-                    self.events[name].start_date = data[1]
-                case "DTEND":
-                    self.events[name].end_date = data[1]
-                case "RRULE":
-                    self.events[name].rrule = data[1]
-                case "DTSTAMP":
-                    self.events[name].dtstamp = data[1]
-                case "UID":
-                    self.events[name].uid = data[1]
-
-    def update_definition(self) -> None:
-
-        definition = self.prefix
-
-        for name in self.events:
-
-            definition += self.events[name].eventdefinition()
-
-            definition += "\r\n"
-
-        definition += self.postfix
-
-        self.definition = definition
-
-class Event:
-
-    def __init__(self) -> None:
-
-        self.summary = ""
-        self.start_date = ""
-        self.end_date = ""
-        self.rrule = ""
-        self.dtstamp = ""
-        self.uid = ""
-
-    def eventdefinition(self):
-
-        definition = "BEGIN:VEVENT\r\nSUMMARY:" + self.summary
-        
-        if self.start_date != "":
-            definition += "\r\nDTSTART:" + self.start_date
-        
-        if self.end_date != "":
-            definition += "\r\nDTEND:" + self.end_date
-            
-        if self.rrule != "":
-            definition += "\r\nRRULE:" + self.rrule
-            
-        if self.dtstamp != "":
-            definition += "\r\nDTSTAMP:" + self.dtstamp
-            
-        if self.uid != "":
-            definition += "\r\nUID:" + self.uid
-            
-        definition += "\r\nEND:VEVENT"
-
-        return definition
