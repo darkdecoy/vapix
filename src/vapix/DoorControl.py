@@ -151,3 +151,22 @@ class Door:
 
             self.LastUpdate = False
             self.Status = "Action Not Supported"
+
+    def set_schedule(self, ScheduleToken, action, name = "", description = "", priority = "High"):
+        
+        resp = self.controller.api._send_request(
+            ("doorcontrol"),
+            method="POST",
+            params={
+                "DoorScheduleConfiguration": [
+                    {
+                        "DoorSchedule": [
+                            {
+                                "ScheduledState": [{ "EnterAction": "Unlock", "ScheduleToken": ["Test"] }]
+                            }
+                        ],
+                        "token": self.token
+                    }
+                ]
+            }
+        )
