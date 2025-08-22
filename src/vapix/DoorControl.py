@@ -59,17 +59,16 @@ class Door:
         self.Capabilities = {}
         self.token = token
         
-        self.DoorPhysicalState = 'Closed'
-        self.Alarm = 'Normal'
-        self.Mode = 'Unlocked'
+        self.DoorPhysicalState = ''
+        self.Alarm = ''
+        self.Mode = ''
 
         self.LastUpdate = True
         self.Status = 'Door Created'
         
-        self.update_info()
-        self.update_status()
+        self.update()
 
-    def _check_action(self, token, action) -> dict:
+    def _check_action(self, token, action) -> None:
         """
         Gets the door info.
 
@@ -82,7 +81,7 @@ class Door:
         else:
             return False
     
-    def update_info(self) -> dict:
+    def _get_info(self) -> None:
         """
         Gets the door info.
 
@@ -101,7 +100,7 @@ class Door:
         self.Capabilities = data['DoorInfo'][0]['Capabilities']
         self.token = data['DoorInfo'][0]['token']
 
-    def update_status(self) -> dict:
+    def _get_state(self) -> None:
         """
         Gets the door info.
 
@@ -119,9 +118,17 @@ class Door:
         self.Alarm = data['DoorState']['Alarm']
         self.Mode = data['DoorState']['DoorMode']
 
-    def update_mode(self, action) -> dict:
+    def update(self) -> None:
         """
-        Update Door.
+        Update Door state and info.
+        """
+
+        self._get_info()
+        self._get_state()
+
+    def set_mode(self, action) -> None:
+        """
+        Set Door Mode.
         """
 
         if action in self.actions and self._check_action(token=self.token, action=action):
@@ -131,7 +138,7 @@ class Door:
                 params={"Token": self.token},
             )
 
-            self.update_status()
+            self._get_state()
 
             if self.Mode.startswith(action):
                 self.LastUpdate = True
