@@ -78,7 +78,7 @@ class api:
             if method == "GET":
                 response = self.session.get(url, params=params)
             elif method == "POST":
-                response = self.session.post(url, data=params)
+                response = self.session.post(url, json=params)
             response.raise_for_status()
             return response.text
         except requests.exceptions.HTTPError:
