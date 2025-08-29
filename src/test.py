@@ -1,14 +1,17 @@
-from vapix.api import api as VapixAPI
+from vapix.api import api
+import icalendar
 
-vapix_api = VapixAPI("192.168.1.137", "root", "changem3")
+control1 = api(host="192.168.1.137", user="root", password="changem3")
 
-doors = vapix_api.doorcontrol.get_info()
+doors = control1.doorcontrol.doors
+schedules = control1.schedule.schedules
 
-for door in doors:
-    state = vapix_api.doorcontrol.update_state(token=door["token"], action="Block")
+schedule_name = 'Test'
 
-    print(state)
+original = schedules[schedule_name].calendar
 
-    state = vapix_api.doorcontrol.update_state(token=door["token"], action="Unlock")
+print(original)
 
-    print(state)
+doors['Door 1'].set_schedule(ScheduleToken="Test", action="Unlock")
+
+print()
