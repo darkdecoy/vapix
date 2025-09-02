@@ -158,15 +158,25 @@ class Door:
             ("doorcontrol"),
             method="POST",
             params={
-                "DoorScheduleConfiguration": [
+                "axtdc:SetDoorScheduleConfiguration": {
+                    "DoorScheduleConfiguration": [
                     {
+                        "token": self.token,
+                        "Name": name,
+                        "Description": description,
                         "DoorSchedule": [
+                        {
+                            "ScheduledState": [
                             {
-                                "ScheduledState": [{ "EnterAction": "Unlock", "ScheduleToken": ["Test"] }]
-                            }
-                        ],
-                        "token": self.token
+                                "ScheduleToken": ScheduleToken,
+                                "EnterAction": action
+                            },
+                            ],
+                            "PriorityLevel": priority
+                        }
+                        ]
                     }
-                ]
+                    ]
+                }
             }
         )
