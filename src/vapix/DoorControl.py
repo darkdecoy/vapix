@@ -65,6 +65,8 @@ class Door:
 
         self.LastUpdate = True
         self.Status = 'Door Created'
+
+        self.schedules = ''
         
         self.update()
 
@@ -152,7 +154,22 @@ class Door:
             self.LastUpdate = False
             self.Status = "Action Not Supported"
 
-    def set_schedule(self, ScheduleToken, action, name = "", description = "", priority = "High"):
+    def get_schedule(self) -> None:
+        """
+        Set Door Mode.
+        """
+
+        resp = self.controller.api._send_request(
+            ("doorcontrol"),
+            method="POST",
+            params={"axtdc:GetDoorScheduleConfiguration":{"Token":[self.token]}}
+        )
+
+        data = json.loads(resp)
+
+        return data['DoorScheduleConfiguration']
+
+    def set_schedule(self, ScheduleToken, action, name = "", description = "", priority = ""):
         
         resp = self.controller.api._send_request(
             ("doorcontrol"),
