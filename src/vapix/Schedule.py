@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import json
 import icalendar
+from datetime import datetime
 
 # Import for type hints only
 if TYPE_CHECKING:
@@ -32,37 +33,119 @@ class ScheduleEndpoint:
     def update_schedules(self):
         self.schedules
 
+    def set_schedule(self, name, operator="addition", schedule = "BEGIN:VCALENDAR\r\nPRODID:\r\nVERSION:2.0\r\nEND:VCALENDAR\r\n", token = "") -> None:
+
+        if operator == "addition":
+            scheduledefinition = schedule
+            exceptionscheduledefinition = ""
+        else:
+            scheduledefinition = ""
+            exceptionscheduledefinition = schedule
+
+        resp = self.api._send_request(
+            ("schedule"),
+            method="POST",
+            params={
+                "axsch:SetSchedule": {
+                    "Schedule":[
+                    {
+                        "Name": name,
+                        "Description": "",
+                        "ScheduleDefinition": scheduledefinition,
+                        "ExceptionScheduleDefinition": exceptionscheduledefinition,
+                        "Attribute":[],
+                        "token": token
+                    }
+                    ]
+                }
+            }
+        )
+
+        self.update_schedules()
+
 class Schedule:
 
-    def __init__(self, schedule: ScheduleEndpoint, token) -> None:
+    def __init__(self, schedule: ScheduleEndpoint, token = "") -> None:
 
+        self.schedule = schedule
         self.api = schedule.api
 
         self.name = ""
         self.token = token
         self.description = ""
         self.attribute = []
-        self.type = "addition"
-        self.calendar = None
+        self.operator = "addition"
+        self.calendar = icalendar.Calendar()
 
-        self.get_schedule()
+        if token != "":
+            
+            self.get_schedule()
 
-    def get_schedule(self):
+    def get_schedule(self) -> None:
 
         resp = self.api._send_request("schedule/GetSchedule", params={"Token": self.token})
 
-        data = json.loads(resp)
+        self.name = resp['Schedule'][0]['Name']
+        self.description = resp['Schedule'][0]['Description']
+        self.attribute = resp['Schedule'][0]['Attribute']
 
-        if data['Schedule'][0]['ScheduleDefinition'] != '':
-            self.type = "addtion"
-            schedule = data['Schedule'][0]['ScheduleDefinition']
+        if len(resp['Schedule']) == 0:
+            return None
 
-        elif data['Schedule'][0]['ExceptionScheduleDefinition']:
-            self.type = "subtraction"
-            schedule = data['Schedule'][0]['ExceptionScheduleDefinition']
+        if resp['Schedule'][0]['ScheduleDefinition'] != '':
+            schedule = resp['Schedule'][0]['ScheduleDefinition']
+
+        elif resp['Schedule'][0]['ExceptionScheduleDefinition']:
+            schedule = resp['Schedule'][0]['ExceptionScheduleDefinition']
 
         self.calendar = icalendar.Calendar.from_ical(schedule)
 
-    def add_calendar(self) -> str:
+    def get_ical(self) -> str:
 
-        return self.calendar.definition
+        return icalendar.Calendar.to_ical(self.calendar).decode("utf-8")
+
+    def update_schedule(self) -> None:
+
+        if self.operator == "addition":
+            scheduledefinition = self.get_ical()
+            exceptionscheduledefinition = ""
+        else:
+            scheduledefinition = ""
+            exceptionscheduledefinition = self.get_ical()
+
+        resp = self.api._send_request(
+            ("schedule"),
+            method="POST",
+            params={
+                "axsch:SetSchedule": {
+                    "Schedule":[
+                    {
+                        "Name": self.name,
+                        "Description": "",
+                        "ScheduleDefinition": scheduledefinition,
+                        "ExceptionScheduleDefinition": exceptionscheduledefinition,
+                        "Attribute":[],
+                        "token": self.token
+                    }
+                    ]
+                }
+            }
+        )
+
+    def add_event(self, name, start, end, rrules = "") -> None:
+
+        event = icalendar.Event()
+
+        event.add('summary', name)
+        event.add('dtstart', start)
+        event.add('dtend', end)
+        event.add('dtstamp', datetime.now())
+
+        if rrules != "":
+            event.add('rrules', rrules)
+
+        self.get_schedule()
+
+        self.calendar.add_component(event)
+
+        self.update_schedule()
