@@ -154,14 +154,12 @@ class Door:
         """
 
         resp = self.controller.api._send_request(
-            ("doorcontrol"),
+            endpoint="doorcontrol",
             method="POST",
             params={"axtdc:GetDoorScheduleConfiguration":{"Token":[self.token]}}
         )
 
-        data = json.loads(resp)
-
-        return data['DoorScheduleConfiguration']
+        self.schedules = resp['DoorScheduleConfiguration']
 
     def set_schedule(self, ScheduleToken, action, name = "", description = "", priority = ""):
         
