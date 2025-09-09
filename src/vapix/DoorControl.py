@@ -54,21 +54,22 @@ class Door:
 
         self.actions = ("Block","DoubleLock","Lock","LockDown","LockDownRelease","LockOpen","LockOpenRelease","Unlock")
 
-        self.Name = ''
-        self.Description = ''
+        self.Name = 'Door'
+        self.Description = 'Door'
         self.Capabilities = {}
         self.token = token
         
-        self.DoorPhysicalState = ''
-        self.Alarm = ''
-        self.Mode = ''
+        self.DoorPhysicalState = False
+        self.Alarm = False
+        self.Mode = False
 
         self.LastUpdate = True
         self.Status = 'Door Created'
 
-        self.schedules = ''
+        self.schedules = []
         
-        self.update()
+        self.update_info()
+        self.update_state()
 
     def _check_action(self, token, action) -> None:
         """
@@ -83,7 +84,7 @@ class Door:
         else:
             return False
     
-    def _get_info(self) -> None:
+    def update_info(self) -> None:
         """
         Gets the door info.
 
