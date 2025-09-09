@@ -103,7 +103,7 @@ class Door:
         self.Capabilities = data['DoorInfo'][0]['Capabilities']
         self.token = data['DoorInfo'][0]['token']
 
-    def _get_state(self) -> None:
+    def update_state(self) -> None:
         """
         Gets the door info.
 
@@ -119,6 +119,8 @@ class Door:
             self.DoorPhysicalState = resp['DoorState']['DoorPhysicalState']
         if self.Capabilities['Alarm']:
             self.Alarm = resp['DoorState']['Alarm']
+
+        self.Mode = resp['DoorState']['DoorMode']
 
     def set_mode(self, action) -> None:
         """
@@ -164,7 +166,7 @@ class Door:
     def set_schedule(self, ScheduleToken, action, name = "", description = "", priority = ""):
         
         resp = self.controller.api._send_request(
-            ("doorcontrol"),
+            endpoint="doorcontrol",
             method="POST",
             params={
                 "axtdc:SetDoorScheduleConfiguration": {
@@ -177,7 +179,7 @@ class Door:
                         {
                             "ScheduledState": [
                             {
-                                "ScheduleToken": ScheduleToken,
+                                "ScheduleToken": [ScheduleToken],
                                 "EnterAction": action
                             },
                             ],
@@ -189,3 +191,5 @@ class Door:
                 }
             }
         )
+
+        self.get_schedule()
