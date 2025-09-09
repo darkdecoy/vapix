@@ -24,9 +24,7 @@ class ScheduleEndpoint:
 
         resp = self.api._send_request("schedule/GetScheduleInfoList")
 
-        data = json.loads(resp)
-
-        for schedule in data['ScheduleInfo']:
+        for schedule in resp['ScheduleInfo']:
 
             self.schedules[schedule['Name']] = Schedule(token=schedule['token'], schedule=self)
     

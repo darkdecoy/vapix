@@ -1,5 +1,6 @@
 import time
 import requests
+import json
 
 from .DoorControl import DoorControl
 from .Schedule import ScheduleEndpoint
@@ -82,7 +83,7 @@ class api:
             elif method == "POST":
                 response = self.session.post(url, json=params)
             response.raise_for_status()
-            return response.text
+            return json.loads(response.text)
         except requests.exceptions.HTTPError:
             raise Exception(response.text)
         except requests.RequestException as e:

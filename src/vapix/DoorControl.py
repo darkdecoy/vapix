@@ -1,6 +1,5 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-import json
 
 # Import for type hints only
 if TYPE_CHECKING:
@@ -29,9 +28,7 @@ class DoorControl:
             "doorcontrol/GetDoorInfoList",
         )
 
-        data = json.loads(resp)
-
-        for door in data['DoorInfo']:
+        for door in resp['DoorInfo']:
 
             self.doors[door['Name']] = Door(token=door['token'], controller=self)
 
@@ -96,12 +93,10 @@ class Door:
             params={"Token": self.token},
         )
 
-        data = json.loads(resp)
-
-        self.Name = data['DoorInfo'][0]['Name']
-        self.Description = data['DoorInfo'][0]['Description']
-        self.Capabilities = data['DoorInfo'][0]['Capabilities']
-        self.token = data['DoorInfo'][0]['token']
+        self.Name = resp['DoorInfo'][0]['Name']
+        self.Description = resp['DoorInfo'][0]['Description']
+        self.Capabilities = resp['DoorInfo'][0]['Capabilities']
+        self.token = resp['DoorInfo'][0]['token']
 
     def update_state(self) -> None:
         """
