@@ -115,19 +115,10 @@ class Door:
             params={"Token": self.token},
         )
 
-        data = json.loads(resp)
-
-        self.DoorPhysicalState = data['DoorState']['DoorPhysicalState']
-        self.Alarm = data['DoorState']['Alarm']
-        self.Mode = data['DoorState']['DoorMode']
-
-    def update(self) -> None:
-        """
-        Update Door state and info.
-        """
-
-        self._get_info()
-        self._get_state()
+        if self.Capabilities['DoorMonitor']:
+            self.DoorPhysicalState = resp['DoorState']['DoorPhysicalState']
+        if self.Capabilities['Alarm']:
+            self.Alarm = resp['DoorState']['Alarm']
 
     def set_mode(self, action) -> None:
         """
