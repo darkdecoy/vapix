@@ -1,18 +1,17 @@
 from vapix.api import api
+from vapix.Schedule import Schedule
 import icalendar
+import datetime
 
-control1 = api(host="192.168.1.137", user="root", password="changem3")
+schedule_name = 'Another One'
+name = 'GGF HR Association Monthly Meeting'
+start = datetime.datetime(2025, 9, 18, 16, 0)
+end = datetime.datetime(2025, 9, 18, 18, 0)
 
-doors = control1.doorcontrol.doors
-schedules = control1.schedule.schedules
-current = doors['Door 1'].get_schedule()
+control1 = api(host="192.168.1.20", user="root", password="changem3")
 
-schedule_name = 'Test'
+control1.schedule.schedules[schedule_name].add_event(name=name, start=start, end=end)
 
-original = schedules[schedule_name].calendar
-
-print(original)
-
-doors['Door 1'].set_schedule(ScheduleToken=schedules[schedule_name].token, action="Lock", name="Door 2")
+control1.doorcontrol.doors['Door 1'].set_schedule(ScheduleToken=control1.schedule.schedules[schedule_name].token, action="Unlock")
 
 print()
