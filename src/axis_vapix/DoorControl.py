@@ -3,14 +3,14 @@ from typing import TYPE_CHECKING
 
 # Import for type hints only
 if TYPE_CHECKING:
-    from .VapixAPI import VapixAPI
+    from .device import device
 
 
 class DoorControl:
 
-    def __init__(self, api: VapixAPI) -> None:
+    def __init__(self, device: device) -> None:
 
-        self.api = api
+        self.api = device.api
         self.api.base_url = "http://" + self.api.host + "/vapix"
 
         self.doors = {}

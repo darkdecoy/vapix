@@ -2,9 +2,6 @@ import time
 import requests
 import json
 
-from .DoorControl import DoorControl
-from .Schedule import ScheduleEndpoint
-
 from requests.auth import HTTPDigestAuth
 
 class api:
@@ -49,8 +46,6 @@ class api:
         self.session = requests.Session()
         self.session.auth = HTTPDigestAuth(self.user, self.password)
         self.session.timeout = timeout
-        self.doorcontrol = DoorControl(self)
-        self.schedule = ScheduleEndpoint(self)
 
     def _send_request(self, endpoint, method="GET", params=None):
         """
@@ -88,13 +83,3 @@ class api:
             raise Exception(response.text)
         except requests.RequestException as e:
             raise e
-
-
-if __name__ == '__main__':
-    import time
-    import os
-    import dotenv
-    dotenv.load_dotenv()
-    api = api(os.environ.get('host'), os.environ.get('user'), os.environ.get('password'))
-    
-    api.session.close()

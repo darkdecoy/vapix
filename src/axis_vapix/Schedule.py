@@ -6,30 +6,27 @@ from datetime import datetime
 
 # Import for type hints only
 if TYPE_CHECKING:
-    from .VapixAPI import VapixAPI
+    from .device import device
 
 
 class ScheduleEndpoint:
 
-    def __init__(self, api: VapixAPI) -> None:
+    def __init__(self, device: device) -> None:
 
-        self.api = api
+        self.api = device.api
         self.api.base_url = "http://" + self.api.host + "/vapix"
 
         self.schedules = {}
 
-        self.get_schedules()
+        self.update_schedules()
 
-    def get_schedules(self):
+    def update_schedules(self):
 
         resp = self.api._send_request("schedule/GetScheduleInfoList")
 
         for schedule in resp['ScheduleInfo']:
 
             self.schedules[schedule['Name']] = Schedule(token=schedule['token'], schedule=self)
-    
-    def update_schedules(self):
-        self.schedules
 
     def set_schedule(self, name, operator="addition", schedule = "BEGIN:VCALENDAR\r\nPRODID:\r\nVERSION:2.0\r\nEND:VCALENDAR\r\n", token = "") -> None:
 
@@ -65,19 +62,17 @@ class Schedule:
 
     def __init__(self, schedule: ScheduleEndpoint, token = "") -> None:
 
-        self.schedule = schedule
         self.api = schedule.api
 
         self.name = ""
         self.token = token
         self.description = ""
         self.attribute = []
+
         self.operator = "addition"
         self.calendar = icalendar.Calendar()
 
-        if token != "":
-            
-            self.get_schedule()
+        self.get_schedule()
 
     def get_schedule(self) -> None:
 
