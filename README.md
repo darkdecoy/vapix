@@ -1,26 +1,21 @@
 # Vapix API Python Wrapper by Axis Communications
 
-This Python library provides a seamless wrapper around the Vapix API by Axis Communications, facilitating effortless interactions with all their  cameras.
+This Python library provides a seamless wrapper around the Vapix API by Axis Communications with support currently for the Axis A1001.
 
 ## Features
 
-- Complete Pythonic access to all Vapix API endpoints.
-- Simplified methods for interacting with all cameras.
-- Built with extensibility and ease-of-use in mind.
+- Configuring Doors
+- Creating and editting schedules
+- Assigning unlock schedules to doors
 
 ## Installation
 
-To install the wrapper, you can use pip: 
-
-TODO - PyPi hosting coming soon
+pip3 install axis_vapix
 
 ## Quick Start
 
 ```python
-from vapix_python.VapixAPI import VapixAPI
+from axis_vapix.device import a1001
 
-# Initialize the API caller with the base URL
-vapix_api = VapixAPI(os.environ.get('host'), os.environ.get('user'), os.environ.get('password'))
-
-print(vapix_api.ptz.get_current_ptz())
+control1 = a1001(host="192.168.1.21", user="root", password="changem3")
 ```
