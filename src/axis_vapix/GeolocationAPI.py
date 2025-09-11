@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 
 # Import for type hints only
 if TYPE_CHECKING:
-    from .VapixAPI import VapixAPI
+    from .device import device
 
 
 class GeolocationAPI:

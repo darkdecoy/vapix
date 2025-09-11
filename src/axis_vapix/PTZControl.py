@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 
 # Import for type hints only
 if TYPE_CHECKING:
-    from .VapixAPI import VapixAPI
+    from .device import device
 
 class PTZControl:
 
