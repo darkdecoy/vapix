@@ -130,8 +130,8 @@ class Schedule:
         event = icalendar.Event()
 
         event.add('summary', name)
-        event.add('dtstart', start)
-        event.add('dtend', end)
+        event.add('dtstart', start.replace(tzinfo=None))
+        event.add('dtend', end.replace(tzinfo=None))
         event.add('dtstamp', datetime.now())
 
         if rrules != "":
