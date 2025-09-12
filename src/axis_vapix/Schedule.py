@@ -72,18 +72,25 @@ class Schedule:
         self.operator = "addition"
         self.calendar = icalendar.Calendar()
 
+        self.limit = 10000
+        self.postfix = 1
+        self.parent = token
+        self.children = set()
+
         self.get_schedule()
 
     def get_schedule(self) -> None:
 
         resp = self.api._send_request("schedule/GetSchedule", params={"Token": self.token})
 
+        if len(resp['Schedule']) == 0:
+            self.calendar = icalendar.Calendar()
+
+            return None
+
         self.name = resp['Schedule'][0]['Name']
         self.description = resp['Schedule'][0]['Description']
         self.attribute = resp['Schedule'][0]['Attribute']
-
-        if len(resp['Schedule']) == 0:
-            return None
 
         if resp['Schedule'][0]['ScheduleDefinition'] != '':
             schedule = resp['Schedule'][0]['ScheduleDefinition']
@@ -141,4 +148,20 @@ class Schedule:
 
         self.calendar.add_component(event)
 
-        self.update_schedule()
+        if len(self.get_ical()) <= self.limit:
+            self.update_schedule()
+        else:
+            current = self.postfix
+            self.postfix += 1
+            
+            if self.name.endswith(str(current)):
+                self.name = self.name.replace((" " + str(current)), (" " + str(self.postfix)))
+                self.token = self.token.replace(("_" + str(current)), ("_" + str(self.postfix)))
+            else:
+                self.name = self.name + " " + str(self.postfix)
+                self.token = self.token + "_" + str(self.postfix)
+            
+            self.get_schedule()
+            self.children.add(self.token)
+
+            self.add_event(name=name, start=start, end=end, rrules=rrules)
