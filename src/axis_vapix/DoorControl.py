@@ -63,10 +63,11 @@ class Door:
         self.LastUpdate = True
         self.Status = 'Door Created'
 
-        self.schedules = []
+        self.unlockschedules = set()
         
         self.update_info()
         self.update_state()
+        self.get_unlockschedules()
 
     def _check_action(self, token, action) -> None:
         """
@@ -143,7 +144,7 @@ class Door:
             self.LastUpdate = False
             self.Status = "Action Not Supported"
 
-    def get_schedule(self) -> None:
+    def get_unlockschedules(self) -> None:
         """
         Set Door Mode.
         """
@@ -154,9 +155,17 @@ class Door:
             params={"axtdc:GetDoorScheduleConfiguration":{"Token":[self.token]}}
         )
 
-        self.schedules = resp['DoorScheduleConfiguration']
+        self.unlockschedules = set(resp['DoorScheduleConfiguration'][0]['DoorSchedule'][0]['ScheduledState'][0]['ScheduleToken'])
 
-    def set_schedule(self, ScheduleToken, action, name = "", description = "", priority = ""):
+    def set_unlockschedules(self, token="", reset=False):
+
+        if reset:
+            self.unlockschedules = set()
+
+        if type(token) is str:
+            self.unlockschedules.add(token)
+        elif type(token) is list:
+            self.unlockschedules.update(token)
         
         resp = self.controller.api._send_request(
             endpoint="doorcontrol",
@@ -166,17 +175,17 @@ class Door:
                     "DoorScheduleConfiguration": [
                     {
                         "token": self.token,
-                        "Name": name,
-                        "Description": description,
+                        "Name": '',
+                        "Description": '',
                         "DoorSchedule": [
                         {
                             "ScheduledState": [
                             {
-                                "ScheduleToken": [ScheduleToken],
-                                "EnterAction": action
+                                "ScheduleToken": list(self.unlockschedules),
+                                "EnterAction": "Unlock"
                             },
                             ],
-                            "PriorityLevel": priority
+                            "PriorityLevel": ''
                         }
                         ]
                     }
@@ -185,4 +194,4 @@ class Door:
             }
         )
 
-        self.get_schedule()
+        self.get_unlockschedules()
