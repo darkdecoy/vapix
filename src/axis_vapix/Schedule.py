@@ -26,7 +26,7 @@ class ScheduleEndpoint:
 
         for schedule in resp['ScheduleInfo']:
 
-            self.schedules[schedule['Name']] = Schedule(token=schedule['token'], schedule=self)
+            self.schedules[schedule['token']] = Schedule(token=schedule['token'], schedule=self)
 
     def set_schedule(self, name, operator="addition", schedule = "BEGIN:VCALENDAR\r\nPRODID:\r\nVERSION:2.0\r\nEND:VCALENDAR\r\n", token = "") -> None:
 
