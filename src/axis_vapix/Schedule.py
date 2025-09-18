@@ -28,35 +28,12 @@ class ScheduleEndpoint:
 
             self.schedules[schedule['token']] = Schedule(token=schedule['token'], schedule=self)
 
-    def set_schedule(self, name, operator="addition", schedule = "BEGIN:VCALENDAR\r\nPRODID:\r\nVERSION:2.0\r\nEND:VCALENDAR\r\n", token = "") -> None:
+    def enable_schedules(self, token):
 
-        if operator == "addition":
-            scheduledefinition = schedule
-            exceptionscheduledefinition = ""
-        else:
-            scheduledefinition = ""
-            exceptionscheduledefinition = schedule
+        if token in self.schedules.keys():
 
-        resp = self.api._send_request(
-            ("schedule"),
-            method="POST",
-            params={
-                "axsch:SetSchedule": {
-                    "Schedule":[
-                    {
-                        "Name": name,
-                        "Description": "",
-                        "ScheduleDefinition": scheduledefinition,
-                        "ExceptionScheduleDefinition": exceptionscheduledefinition,
-                        "Attribute":[],
-                        "token": token
-                    }
-                    ]
-                }
-            }
-        )
-
-        self.update_schedules()
+            self.schedules[token].enabled = True
+            self.schedules[token].get_schedule()
 
 class Schedule:
 
@@ -76,61 +53,64 @@ class Schedule:
         self.postfix = 1
         self.parent = token
         self.children = set()
+        self.enabled = False
 
         self.get_schedule()
 
     def get_schedule(self) -> None:
 
-        resp = self.api._send_request("schedule/GetSchedule", params={"Token": self.token})
+        if self.enabled:
+            resp = self.api._send_request("schedule/GetSchedule", params={"Token": self.token})
 
-        if len(resp['Schedule']) == 0:
-            self.calendar = icalendar.Calendar()
+            if len(resp['Schedule']) == 0:
+                self.calendar = icalendar.Calendar()
 
-            return None
+                return None
 
-        self.name = resp['Schedule'][0]['Name']
-        self.description = resp['Schedule'][0]['Description']
-        self.attribute = resp['Schedule'][0]['Attribute']
+            self.name = resp['Schedule'][0]['Name']
+            self.description = resp['Schedule'][0]['Description']
+            self.attribute = resp['Schedule'][0]['Attribute']
 
-        if resp['Schedule'][0]['ScheduleDefinition'] != '':
-            schedule = resp['Schedule'][0]['ScheduleDefinition']
+            if resp['Schedule'][0]['ScheduleDefinition'] != '':
+                schedule = resp['Schedule'][0]['ScheduleDefinition']
 
-        elif resp['Schedule'][0]['ExceptionScheduleDefinition']:
-            schedule = resp['Schedule'][0]['ExceptionScheduleDefinition']
+            elif resp['Schedule'][0]['ExceptionScheduleDefinition']:
+                schedule = resp['Schedule'][0]['ExceptionScheduleDefinition']
 
-        self.calendar = icalendar.Calendar.from_ical(schedule)
+            self.calendar = icalendar.Calendar.from_ical(schedule)
 
     def get_ical(self) -> str:
 
         return icalendar.Calendar.to_ical(self.calendar).decode("utf-8")
 
-    def update_schedule(self) -> None:
+    def update(self) -> None:
 
-        if self.operator == "addition":
-            scheduledefinition = self.get_ical()
-            exceptionscheduledefinition = ""
-        else:
-            scheduledefinition = ""
-            exceptionscheduledefinition = self.get_ical()
+        if self.enabled:
+            if self.operator == "addition":
+                scheduledefinition = self.get_ical()
+                exceptionscheduledefinition = ""
+            else:
+                scheduledefinition = ""
+                exceptionscheduledefinition = self.get_ical()
 
-        resp = self.api._send_request(
-            ("schedule"),
-            method="POST",
-            params={
-                "axsch:SetSchedule": {
-                    "Schedule":[
-                    {
-                        "Name": self.name,
-                        "Description": "",
-                        "ScheduleDefinition": scheduledefinition,
-                        "ExceptionScheduleDefinition": exceptionscheduledefinition,
-                        "Attribute":[],
-                        "token": self.token
+            resp = self.api._send_request(
+                ("schedule"),
+                method="POST",
+                params={
+                    "axsch:SetSchedule": {
+                        "Schedule":[
+                        {
+                            "Name": self.name,
+                            "Description": "",
+                            "ScheduleDefinition": scheduledefinition,
+                            "ExceptionScheduleDefinition": exceptionscheduledefinition,
+                            "Attribute":[],
+                            "token": self.token
+                        }
+                        ]
                     }
-                    ]
                 }
-            }
-        )
+            )
 
     def add_event(self, name, start, end, rrules = "") -> None:
 
