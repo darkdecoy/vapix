@@ -28,6 +28,17 @@ class ScheduleEndpoint:
 
             self.schedules[schedule['token']] = Schedule(token=schedule['token'], schedule=self)
 
+    def create_schedule(self, name, operator="addition", token = "") -> None:
+
+        self.schedules[token] = Schedule(token=token, schedule=self)
+
+        self.schedules[token].name = name
+        self.schedules[token].operator = operator
+        self.schedules[token].enabled = True
+
+        self.schedules[token].update()
+        self.schedules[token].get_schedule()
+
     def enable_schedules(self, token):
 
         if token in self.schedules.keys():
