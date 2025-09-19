@@ -189,6 +189,7 @@ class Schedule:
                 calendar.add_component(event)
 
         self.calendar = calendar
+        self.update()
 
     def remove_pastevents(self) -> None:
 
@@ -202,4 +203,3 @@ class Schedule:
                 remove.append(event)
 
         self.remove_events(events=remove)
-        self.update()
