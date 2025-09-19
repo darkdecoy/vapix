@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import json
 import icalendar
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Import for type hints only
 if TYPE_CHECKING:
@@ -85,6 +85,7 @@ class Schedule:
         self.parent = token
         self.children = set()
         self.enabled = False
+        self.removal_limit = 30
 
         self.get_schedule()
 
@@ -176,3 +177,29 @@ class Schedule:
             self.children.add(self.token)
 
             self.add_event(name=name, start=start, end=end, rrules=rrules)
+
+    def remove_events(self, events: list) -> None:
+
+        calendar = icalendar.Calendar()
+
+        for event in self.calendar.events:
+
+            if event not in events:
+
+                calendar.add_component(event)
+
+        self.calendar = calendar
+
+    def remove_pastevents(self) -> None:
+
+        now = datetime.now() - timedelta(self.removal_limit)
+        remove = list()
+
+        for event in self.calendar.events:
+
+            if event.end < now:
+
+                remove.append(event)
+
+        self.remove_events(events=remove)
+        self.update()
