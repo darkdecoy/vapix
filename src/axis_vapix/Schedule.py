@@ -39,6 +39,26 @@ class ScheduleEndpoint:
         self.schedules[token].update()
         self.schedules[token].get_schedule()
 
+    def remove_schedule(self, token, force=False):
+
+        if len(self.schedules[token].calendar.events) == 0:
+
+            resp = self.api._send_request(
+                ("schedule"),
+                method="POST",
+                params={"axsch:RemoveSchedule":{"Token":[token]}}
+            )
+
+        elif force:
+
+            resp = self.api._send_request(
+                ("schedule"),
+                method="POST",
+                params={"axsch:RemoveSchedule":{"Token":[token]}}
+            )
+
+        self.update_schedules()
+
     def enable_schedules(self, token):
 
         if token in self.schedules.keys():
