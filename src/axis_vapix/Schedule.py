@@ -63,7 +63,18 @@ class ScheduleEndpoint:
             )
 
             del self.schedules[token]
+
         self.update_schedules()
+
+    def remove_pastschedules(self):
+
+        for token in list(self.schedules.keys()):
+
+            if self.schedules[token].enabled:
+                
+                self.schedules[token].remove_pastevents()
+                self.schedules[token].get_schedule()
+                self.remove_schedule(token=token)
 
     def enable_schedules(self, token):
 
