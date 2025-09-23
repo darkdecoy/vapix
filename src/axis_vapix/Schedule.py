@@ -26,7 +26,10 @@ class ScheduleEndpoint:
 
         for schedule in resp['ScheduleInfo']:
 
-            self.schedules[schedule['token']] = Schedule(token=schedule['token'], schedule=self)
+            if schedule['token'] in self.schedules.keys():
+                self.schedules[schedule['token']].get_schedule()
+            else:
+                self.schedules[schedule['token']] = Schedule(token=schedule['token'], schedule=self)
 
     def create_schedule(self, name, operator="addition", token = "") -> None:
 
@@ -105,9 +108,11 @@ class Schedule:
 
             if resp['Schedule'][0]['ScheduleDefinition'] != '':
                 schedule = resp['Schedule'][0]['ScheduleDefinition']
+                self.operator = "addition"
 
             elif resp['Schedule'][0]['ExceptionScheduleDefinition']:
                 schedule = resp['Schedule'][0]['ExceptionScheduleDefinition']
+                self.operator = "subtraction"
 
             self.calendar = icalendar.Calendar.from_ical(schedule)
 
