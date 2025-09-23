@@ -52,6 +52,8 @@ class ScheduleEndpoint:
                 params={"axsch:RemoveSchedule":{"Token":[token]}}
             )
 
+            del self.schedules[token]
+
         elif force:
 
             resp = self.api._send_request(
@@ -60,6 +62,7 @@ class ScheduleEndpoint:
                 params={"axsch:RemoveSchedule":{"Token":[token]}}
             )
 
+            del self.schedules[token]
         self.update_schedules()
 
     def enable_schedules(self, token):
