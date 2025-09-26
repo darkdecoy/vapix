@@ -44,27 +44,29 @@ class ScheduleEndpoint:
 
     def remove_schedule(self, token, force=False):
 
-        if len(self.schedules[token].calendar.events) == 0:
+        if self.schedules[token].enabled:
 
-            resp = self.api._send_request(
-                ("schedule"),
-                method="POST",
-                params={"axsch:RemoveSchedule":{"Token":[token]}}
-            )
+            if len(self.schedules[token].calendar.events) == 0:
 
-            del self.schedules[token]
+                resp = self.api._send_request(
+                    ("schedule"),
+                    method="POST",
+                    params={"axsch:RemoveSchedule":{"Token":[token]}}
+                )
 
-        elif force:
+                del self.schedules[token]
 
-            resp = self.api._send_request(
-                ("schedule"),
-                method="POST",
-                params={"axsch:RemoveSchedule":{"Token":[token]}}
-            )
+            elif force:
 
-            del self.schedules[token]
+                resp = self.api._send_request(
+                    ("schedule"),
+                    method="POST",
+                    params={"axsch:RemoveSchedule":{"Token":[token]}}
+                )
 
-        self.update_schedules()
+                del self.schedules[token]
+
+            self.update_schedules()
 
     def remove_pastschedules(self):
 
