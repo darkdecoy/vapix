@@ -179,7 +179,8 @@ class Schedule:
 
         self.get_schedule()
 
-        self.calendar.add_component(event)
+        if not self.check_exists(event=event):
+            self.calendar.add_component(event)
 
         if len(self.get_ical()) <= self.limit:
             self.update()
@@ -198,6 +199,13 @@ class Schedule:
             self.children.add(self.token)
 
             self.add_event(name=name, start=start, end=end, rrules=rrules)
+
+    def check_exists(self, event) -> bool:
+
+        for e in self.calendar.events:
+
+            if e['SUMMARY'] == event['SUMMARY'] and e.start == event.start and e.end == event.end:
+                return True
 
     def remove_events(self, events: list) -> None:
 
