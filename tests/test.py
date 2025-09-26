@@ -13,15 +13,15 @@ def init():
                 "postfix_pattern": " %Y %m",
                 "tags": ["Manager01"]}]},
         "schedule": {
-            "name": 'AnotherOne',
+            "name": 'Manager01 AnotherOne',
             "token": ("manager01_" + "anotherone"),
-            "tokens": list()},
+            "tags": list()},
         "event": {
             "name": 'Test Meeting 1',
             "starts_at": datetime.datetime(2025, 7, 18, 16, 0),
             "ends_at": datetime.datetime(2025, 7, 18, 18, 0)}}
 
-    data["schedule"]["tokens"].append(data["schedule"]["token"])
+    data["schedule"]["tags"].append("manager01")
 
     data["controller"]["api"] = a1001(
             host=data["controller"]["host"],
@@ -35,7 +35,7 @@ def poll(controller, data):
 
     for token in controller["api"].schedule.schedules.keys():
 
-        if token.split("_")[0].lower() in data["schedule"]["tokens"]:
+        if token.split("_")[0].lower() in data["schedule"]["tags"]:
 
             controller["api"].schedule.schedules[token].enabled = True
 
