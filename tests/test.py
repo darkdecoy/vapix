@@ -33,8 +33,6 @@ def init():
 
 def poll(controller, data):
 
-    controller["api"].schedule.create_schedule(name=data["schedule"]["name"], operator="addition", token=data["schedule"]["token"])
-
     for token in controller["api"].schedule.schedules.keys():
 
         if token.split("_")[0].lower() in data["schedule"]["tokens"]:
@@ -77,6 +75,8 @@ def push(controller, data):
                 controller["api"].doorcontrol.doors[door["name"]].set_unlockschedules(
                     token=schedule_token, reset=False
                 )
+
+    controller["api"].schedule.create_schedule(name=data["schedule"]["name"], operator="addition", token=data["schedule"]["token"])
 
 
 def purge(controller):
