@@ -134,7 +134,9 @@ class Schedule:
 
     def get_ical(self) -> str:
 
-        return icalendar.Calendar.to_ical(self.calendar).decode("utf-8")
+        ical = icalendar.Calendar.to_ical(self.calendar).decode("utf-8")
+
+        return ical.replace("CATEGORIES:\r\n","")
 
     def update(self) -> None:
 
