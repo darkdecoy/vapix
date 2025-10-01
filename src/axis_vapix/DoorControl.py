@@ -101,7 +101,7 @@ class Door:
 
     def update_state(self) -> None:
         """
-        Gets the door info.
+        Gets the door state info.
 
         Returns:
             list: A dictionary containing door state info.
@@ -146,7 +146,7 @@ class Door:
 
     def get_unlockschedules(self) -> None:
         """
-        Set Door Mode.
+        Get Unlock Schedules for Door.
         """
 
         resp = self.controller.api._send_request(
