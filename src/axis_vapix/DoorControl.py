@@ -144,6 +144,18 @@ class Door:
             self.LastUpdate = False
             self.Status = "Action Not Supported"
 
+    def check_schedule(self, token) -> None:
+        """
+        Check if schedule exists.
+        """
+
+        resp = self.controller.api._send_request("schedule/GetSchedule", params={"Token": token})
+
+        if len(resp['Schedule']) == 0:
+            return False
+        else:
+            return true
+
     def get_unlockschedules(self) -> None:
         """
         Get Unlock Schedules for Door.
@@ -155,7 +167,16 @@ class Door:
             params={"axtdc:GetDoorScheduleConfiguration":{"Token":[self.token]}}
         )
 
-        self.unlockschedules = set(resp['DoorScheduleConfiguration'][0]['DoorSchedule'][0]['ScheduledState'][0]['ScheduleToken'])
+        schedules = set()
+
+        for token in resp['DoorScheduleConfiguration'][0]['DoorSchedule'][0]['ScheduledState'][0]['ScheduleToken']:
+
+            status = self.check_schedule(token=token)
+
+            if status:
+                schedules.add(token)
+
+        self.unlockschedules = schedules
 
     def set_unlockschedules(self, token="", reset=False):
 
