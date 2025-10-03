@@ -159,8 +159,13 @@ class Door:
 
     def set_unlockschedules(self, token="", reset=False):
 
+        exists = False
+        
         if reset:
             self.unlockschedules = set()
+
+        if token in self.unlockschedules:
+            exists = True
 
         if type(token) is str:
             self.unlockschedules.add(token)
@@ -196,7 +201,7 @@ class Door:
 
         self.get_unlockschedules()
 
-        if token in self.unlockschedules:
+        if token in self.unlockschedules and not exists:
             return 0
         else:
             return 1
