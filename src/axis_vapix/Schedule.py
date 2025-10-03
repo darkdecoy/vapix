@@ -182,9 +182,12 @@ class Schedule:
 
         if not self.check_exists(event=event):
             self.calendar.add_component(event)
+        else:
+            return 1
 
         if len(self.get_ical()) <= self.limit:
             self.update()
+            return 0
         else:
             current = self.postfix
             self.postfix += 1
