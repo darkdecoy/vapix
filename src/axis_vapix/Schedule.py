@@ -33,9 +33,8 @@ class ScheduleEndpoint:
 
     def create_schedule(self, token, name = "", operator="addition") -> None:
 
-        self.schedules[token] = Schedule(token=token, schedule=self)
+        self.schedules[token] = Schedule(token=token, name=name, schedule=self)
 
-        self.schedules[token].name = name
         self.schedules[token].operator = operator
         self.schedules[token].enabled = True
 
@@ -87,11 +86,11 @@ class ScheduleEndpoint:
 
 class Schedule:
 
-    def __init__(self, schedule: ScheduleEndpoint, token = "") -> None:
+    def __init__(self, schedule: ScheduleEndpoint, token = "", name = "") -> None:
 
         self.api = schedule.api
 
-        self.name = ""
+        self.name = name
         self.token = token
         self.description = ""
         self.attribute = []
