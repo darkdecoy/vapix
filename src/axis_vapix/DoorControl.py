@@ -154,7 +154,7 @@ class Door:
         if len(resp['Schedule']) == 0:
             return False
         else:
-            return true
+            return True
 
     def get_unlockschedules(self) -> None:
         """
