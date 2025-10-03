@@ -195,3 +195,8 @@ class Door:
         )
 
         self.get_unlockschedules()
+
+        if token in self.unlockschedules:
+            return 0
+        else:
+            return 1
