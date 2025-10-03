@@ -31,7 +31,7 @@ class ScheduleEndpoint:
             else:
                 self.schedules[schedule['token']] = Schedule(token=schedule['token'], schedule=self)
 
-    def create_schedule(self, name, operator="addition", token = "") -> None:
+    def create_schedule(self, token, name = "", operator="addition") -> None:
 
         self.schedules[token] = Schedule(token=token, schedule=self)
 
