@@ -65,8 +65,8 @@ class Door:
 
         self.unlockschedules = set()
         
-        self.update_info()
-        self.update_state()
+        self.get_info()
+        self.get_state()
         self.get_unlockschedules()
 
     def _check_action(self, token, action) -> None:
@@ -82,7 +82,7 @@ class Door:
         else:
             return False
     
-    def update_info(self) -> None:
+    def get_info(self) -> None:
         """
         Gets the door info.
 
@@ -99,7 +99,7 @@ class Door:
         self.Capabilities = resp['DoorInfo'][0]['Capabilities']
         self.token = resp['DoorInfo'][0]['token']
 
-    def update_state(self) -> None:
+    def get_state(self) -> None:
         """
         Gets the door state info.
 

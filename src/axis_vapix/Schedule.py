@@ -18,9 +18,9 @@ class ScheduleEndpoint:
 
         self.schedules = {}
 
-        self.update_schedules()
+        self.get_schedules()
 
-    def update_schedules(self):
+    def get_schedules(self):
 
         resp = self.api._send_request("schedule/GetScheduleInfoList")
 
@@ -65,7 +65,7 @@ class ScheduleEndpoint:
 
                 del self.schedules[token]
 
-            self.update_schedules()
+            self.get_schedules()
 
     def remove_pastschedules(self):
 
