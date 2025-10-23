@@ -11,10 +11,12 @@ if TYPE_CHECKING:
 
 class ScheduleEndpoint:
 
-    def __init__(self, device: device) -> None:
+    def __init__(self, device: device, removal_limit: 30) -> None:
 
         self.api = device.api
         self.api.base_url = "http://" + self.api.host + "/vapix"
+
+        self.removal_limit = removal_limit
 
         self.schedules = {}
 
@@ -29,14 +31,11 @@ class ScheduleEndpoint:
             if schedule['token'] in self.schedules.keys():
                 self.schedules[schedule['token']].get_schedule()
             else:
-                self.schedules[schedule['token']] = Schedule(token=schedule['token'], schedule=self)
+                self.schedules[schedule['token']] = Schedule(token=schedule['token'], schedule=self, enabled=False, removal_limit=self.removal_limit)
 
     def create_schedule(self, token, name = "", operator="addition") -> None:
 
-        self.schedules[token] = Schedule(token=token, name=name, schedule=self)
-
-        self.schedules[token].operator = operator
-        self.schedules[token].enabled = True
+        self.schedules[token] = Schedule(token=token, name=name, schedule=self, operator=operator, enabled=True, removal_limit=self.removal_limit)
 
         self.schedules[token].update()
         self.schedules[token].get_schedule()
@@ -86,7 +85,7 @@ class ScheduleEndpoint:
 
 class Schedule:
 
-    def __init__(self, schedule: ScheduleEndpoint, token = "", name = "") -> None:
+    def __init__(self, schedule: ScheduleEndpoint, token = "", name = "", operator = "addition", enabled = False, removal_limit = 30) -> None:
 
         self.api = schedule.api
 
@@ -95,15 +94,16 @@ class Schedule:
         self.description = ""
         self.attribute = []
 
-        self.operator = "addition"
+        self.operator = operator
         self.calendar = icalendar.Calendar()
+
+        self.parent = token
+        self.enabled = enabled
+        self.removal_limit = removal_limit
 
         self.limit = 10000
         self.postfix = 1
-        self.parent = token
         self.children = set()
-        self.enabled = False
-        self.removal_limit = 30
 
         self.get_schedule()
 
