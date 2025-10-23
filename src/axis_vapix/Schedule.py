@@ -11,9 +11,9 @@ if TYPE_CHECKING:
 
 class ScheduleEndpoint:
 
-    def __init__(self, device: device, removal_limit: 30) -> None:
+    def __init__(self, api: api, removal_limit: 30) -> None:
 
-        self.api = device.api
+        self.api = api
         self.api.base_url = "http://" + self.api.host + "/vapix"
 
         self.removal_limit = removal_limit
