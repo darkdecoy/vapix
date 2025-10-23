@@ -5,7 +5,7 @@ def init():
 
     data = {
         "controller": {
-            "host": "192.168.1.20",
+            "host": "102.253.35.218",
             "user": "root",
             "password": "changem3",
             "doors": [{
@@ -18,8 +18,8 @@ def init():
             "tags": list()},
         "event": {
             "name": 'Test Meeting 1',
-            "starts_at": datetime.datetime(2025, 7, 18, 16, 0),
-            "ends_at": datetime.datetime(2025, 7, 18, 18, 0)}}
+            "starts_at": datetime.datetime(2025, 11, 18, 16, 0),
+            "ends_at": datetime.datetime(2025, 11, 18, 18, 0)}}
 
     data["schedule"]["tags"].append("manager01")
 
@@ -27,6 +27,7 @@ def init():
             host=data["controller"]["host"],
             user=data["controller"]["user"],
             password=data["controller"]["password"],
+            removal_limit=10
         )
 
     return data
@@ -86,6 +87,14 @@ def purge(controller):
     print()
 
 
+def cleanup(controller, data):
+
+    for key in list(controller["api"].schedule.schedules.keys()):
+
+        if controller["api"].schedule.schedules[key].enabled:
+
+            controller["api"].schedule.remove_schedule(token=key, force=True)
+
 def main():
 
     data = init()
@@ -97,6 +106,8 @@ def main():
     push(controller=data["controller"], data=data)
 
     print("...Test Completed")
+
+    cleanup(controller=data["controller"], data=data)
 
 
 if __name__ == "__main__":
